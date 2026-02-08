@@ -1,0 +1,29 @@
+# Environment and secrets
+.env
+.streamlit/secrets.toml
+
+# Google OAuth tokens
+credentials.json
+token.json
+slides_token.json
+youtube_token.json
+
+# Temporary files
+.tmp/
+__pycache__/
+*.pyc
+*.pyo
+
+# Output files (optional - comment out if you want to track outputs)
+output/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Claude Code plans
+.claude/plans/

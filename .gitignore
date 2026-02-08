@@ -9,13 +9,15 @@ slides_token.json
 youtube_token.json
 
 # Temporary files
-.tmp/
+.tmp/*
+!.tmp/.gitkeep
 __pycache__/
 *.pyc
 *.pyo
 
-# Output files (optional - comment out if you want to track outputs)
-output/
+# Output files
+output/*
+!output/.gitkeep
 
 # IDE
 .vscode/

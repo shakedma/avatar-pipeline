@@ -26,17 +26,21 @@ def load_streamlit_secrets():
     secrets_keys = ['ELEVENLABS_API_KEY', 'ELEVENLABS_VOICE_ID', 'ELEVENLABS_MODEL',
                     'HEYGEN_API_KEY', 'HEYGEN_AVATAR_ID', 'NOTIFICATION_EMAIL',
                     'GOOGLE_SHEET_ID', 'GOOGLE_DRIVE_FOLDER_ID']
+    loaded = []
     for key in secrets_keys:
         try:
             if key in st.secrets:
                 os.environ[key] = str(st.secrets[key])
-        except Exception:
+                loaded.append(key)
+        except Exception as e:
             pass
+    return loaded
 
-# Load secrets
+# Load secrets at startup
+_loaded_secrets = []
 try:
-    load_streamlit_secrets()
-except Exception:
+    _loaded_secrets = load_streamlit_secrets()
+except Exception as e:
     pass  # No secrets configured, will use .env file
 
 # Import pipeline tools (after setting up environment)
@@ -119,6 +123,12 @@ def main():
     st.title("🎬 AI Avatar Pipeline")
     st.markdown("Transform your scripts into professional avatar videos")
 
+    # Debug: Show loaded secrets (remove this after debugging)
+    with st.expander("Debug: API Configuration", expanded=False):
+        st.write("Secrets loaded from Streamlit Cloud:", _loaded_secrets if _loaded_secrets else "None")
+        st.write("ELEVENLABS_API_KEY set:", "Yes" if os.getenv("ELEVENLABS_API_KEY") else "No")
+        st.write("HEYGEN_API_KEY set:", "Yes" if os.getenv("HEYGEN_API_KEY") else "No")
+
     # Initialize session state
     if 'phase' not in st.session_state:
         st.session_state.phase = 'upload'  # upload, audio_generated, video_generated
@@ -167,14 +177,14 @@ def main():
 
                 st.success(f"Script loaded: {len(script_text)} characters")
 
-                # Full script preview with scrollable text area
+                # Full script preview - using markdown for proper text display
                 with st.expander("Preview full script", expanded=True):
-                    st.text_area(
-                        "Script content",
-                        value=script_text,
-                        height=300,
-                        disabled=True,
-                        label_visibility="collapsed"
+                    # Display as preformatted text with scroll
+                    st.markdown(
+                        f'<div style="max-height: 300px; overflow-y: auto; padding: 10px; '
+                        f'background-color: #f0f2f6; border-radius: 5px; white-space: pre-wrap;">'
+                        f'{script_text}</div>',
+                        unsafe_allow_html=True
                     )
 
                 if st.button("🎵 Generate Audio Options", type="primary"):

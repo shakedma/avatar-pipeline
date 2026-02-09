@@ -13,8 +13,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-HEYGEN_API_KEY = os.getenv("HEYGEN_API_KEY")
 VIDEO_STATUS_URL = "https://api.heygen.com/v1/video_status.get"
+
+def get_api_key():
+    """Get API key at call time for Streamlit secrets support."""
+    return os.getenv("HEYGEN_API_KEY")
 
 
 def check_video_status(video_id: str) -> dict:
@@ -27,11 +30,12 @@ def check_video_status(video_id: str) -> dict:
     Returns:
         Dictionary with status info including video_url when complete
     """
-    if not HEYGEN_API_KEY:
+    api_key = get_api_key()
+    if not api_key:
         raise ValueError("HEYGEN_API_KEY not found in environment variables")
 
     headers = {
-        "X-Api-Key": HEYGEN_API_KEY
+        "X-Api-Key": api_key
     }
 
     params = {

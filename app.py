@@ -21,19 +21,23 @@ from dotenv import load_dotenv
 load_dotenv(project_root / ".env")
 
 # Override with Streamlit secrets if available (for cloud deployment)
-try:
+def load_streamlit_secrets():
+    """Load secrets from Streamlit Cloud into environment variables."""
     secrets_keys = ['ELEVENLABS_API_KEY', 'ELEVENLABS_VOICE_ID', 'ELEVENLABS_MODEL',
                     'HEYGEN_API_KEY', 'HEYGEN_AVATAR_ID', 'NOTIFICATION_EMAIL',
                     'GOOGLE_SHEET_ID', 'GOOGLE_DRIVE_FOLDER_ID']
     for key in secrets_keys:
         try:
-            value = st.secrets.get(key)
-            if value:
-                os.environ[key] = str(value)
+            if key in st.secrets:
+                os.environ[key] = str(st.secrets[key])
         except Exception:
             pass
+
+# Load secrets
+try:
+    load_streamlit_secrets()
 except Exception:
-    pass  # No secrets configured, use .env file
+    pass  # No secrets configured, will use .env file
 
 # Import pipeline tools (after setting up environment)
 from elevenlabs_tts import text_to_speech_dual

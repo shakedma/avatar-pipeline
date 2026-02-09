@@ -12,9 +12,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-HEYGEN_API_KEY = os.getenv("HEYGEN_API_KEY")
-HEYGEN_AVATAR_ID = os.getenv("HEYGEN_AVATAR_ID")
 VIDEO_GENERATE_URL = "https://api.heygen.com/v2/video/generate"
+
+def get_api_key():
+    """Get API key at call time for Streamlit secrets support."""
+    return os.getenv("HEYGEN_API_KEY")
+
+def get_avatar_id():
+    """Get avatar ID at call time for Streamlit secrets support."""
+    return os.getenv("HEYGEN_AVATAR_ID")
 
 
 def create_video(audio_asset_id: str, avatar_id: str = None, background_color: str = "#ffffff") -> str:
@@ -29,15 +35,16 @@ def create_video(audio_asset_id: str, avatar_id: str = None, background_color: s
     Returns:
         The video_id for tracking the generation
     """
-    if not HEYGEN_API_KEY:
+    api_key = get_api_key()
+    if not api_key:
         raise ValueError("HEYGEN_API_KEY not found in environment variables")
 
-    avatar = avatar_id or HEYGEN_AVATAR_ID
+    avatar = avatar_id or get_avatar_id()
     if not avatar:
         raise ValueError("Avatar ID not provided and HEYGEN_AVATAR_ID not found in environment")
 
     headers = {
-        "X-Api-Key": HEYGEN_API_KEY,
+        "X-Api-Key": api_key,
         "Content-Type": "application/json"
     }
 

@@ -12,8 +12,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-HEYGEN_API_KEY = os.getenv("HEYGEN_API_KEY")
 UPLOAD_URL = "https://upload.heygen.com/v1/asset"
+
+def get_api_key():
+    """Get API key at call time for Streamlit secrets support."""
+    return os.getenv("HEYGEN_API_KEY")
 
 
 def upload_audio(audio_path: str) -> dict:
@@ -26,14 +29,15 @@ def upload_audio(audio_path: str) -> dict:
     Returns:
         Dictionary containing asset_id and asset_url
     """
-    if not HEYGEN_API_KEY:
+    api_key = get_api_key()
+    if not api_key:
         raise ValueError("HEYGEN_API_KEY not found in environment variables")
 
     if not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
 
     headers = {
-        "X-API-KEY": HEYGEN_API_KEY,
+        "X-API-KEY": api_key,
         "Content-Type": "audio/mpeg"
     }
 

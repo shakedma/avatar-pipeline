@@ -22,6 +22,15 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+def get_api_key():
+    """Get API key - reads at call time to support Streamlit secrets."""
+    return os.getenv("ELEVENLABS_API_KEY")
+
+def get_voice_id():
+    """Get voice ID - reads at call time to support Streamlit secrets."""
+    return os.getenv("ELEVENLABS_VOICE_ID")
+
+# Keep for backward compatibility with CLI usage
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 
@@ -71,10 +80,11 @@ def text_to_speech(
     Returns:
         Path to the generated audio file
     """
-    if not ELEVENLABS_API_KEY:
+    api_key = get_api_key()
+    if not api_key:
         raise ValueError("ELEVENLABS_API_KEY not found in environment variables")
 
-    voice = voice_id or ELEVENLABS_VOICE_ID
+    voice = voice_id or get_voice_id()
     if not voice:
         raise ValueError("Voice ID not provided and ELEVENLABS_VOICE_ID not found in environment")
 
@@ -91,7 +101,7 @@ def text_to_speech(
     headers = {
         "Accept": "audio/mpeg",
         "Content-Type": "application/json",
-        "xi-api-key": ELEVENLABS_API_KEY
+        "xi-api-key": api_key
     }
 
     data = {

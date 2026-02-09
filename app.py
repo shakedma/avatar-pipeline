@@ -21,12 +21,19 @@ from dotenv import load_dotenv
 load_dotenv(project_root / ".env")
 
 # Override with Streamlit secrets if available (for cloud deployment)
-if hasattr(st, 'secrets'):
-    for key in ['ELEVENLABS_API_KEY', 'ELEVENLABS_VOICE_ID', 'ELEVENLABS_MODEL',
-                'HEYGEN_API_KEY', 'HEYGEN_AVATAR_ID', 'NOTIFICATION_EMAIL',
-                'GOOGLE_SHEET_ID', 'GOOGLE_DRIVE_FOLDER_ID']:
-        if key in st.secrets:
-            os.environ[key] = st.secrets[key]
+try:
+    secrets_keys = ['ELEVENLABS_API_KEY', 'ELEVENLABS_VOICE_ID', 'ELEVENLABS_MODEL',
+                    'HEYGEN_API_KEY', 'HEYGEN_AVATAR_ID', 'NOTIFICATION_EMAIL',
+                    'GOOGLE_SHEET_ID', 'GOOGLE_DRIVE_FOLDER_ID']
+    for key in secrets_keys:
+        try:
+            value = st.secrets.get(key)
+            if value:
+                os.environ[key] = str(value)
+        except Exception:
+            pass
+except Exception:
+    pass  # No secrets configured, use .env file
 
 # Import pipeline tools (after setting up environment)
 from elevenlabs_tts import text_to_speech_dual
@@ -156,8 +163,15 @@ def main():
 
                 st.success(f"Script loaded: {len(script_text)} characters")
 
-                with st.expander("Preview script"):
-                    st.text(script_text[:1000] + ("..." if len(script_text) > 1000 else ""))
+                # Full script preview with scrollable text area
+                with st.expander("Preview full script", expanded=True):
+                    st.text_area(
+                        "Script content",
+                        value=script_text,
+                        height=300,
+                        disabled=True,
+                        label_visibility="collapsed"
+                    )
 
                 if st.button("🎵 Generate Audio Options", type="primary"):
                     st.session_state.phase = 'generating_audio'
